@@ -1,0 +1,15 @@
+## Where the vocab(s) will be written
+src_vocab: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/run/example.vocab.src
+tgt_vocab: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/run/example.vocab.tgt
+# Prevent overwriting existing files in the folder
+
+# Corpus opts:
+data:
+  corpus_1:
+    path_src: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/src-train.txt
+    path_tgt: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/tgt-train.txt
+  valid:
+    path_src: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/src-val.txt
+    path_tgt: E:/Works/Injection/runtime_materials/translation_datasets/sqli2xss/tgt-val.txt
+
+
