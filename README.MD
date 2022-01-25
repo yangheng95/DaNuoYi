@@ -80,13 +80,13 @@ time.sleep(5)
 ### Experiment Results Visualization
 - The distribution of the bypassing test injections count on Ngx-Lua-WAF over 10 runs under the same search budget.
 
-[![NGX-Lua-WAF](document/box_ngx.pdf)
+![NGX-Lua-WAF](document/box_ngx.png)
 - The distribution of the bypassing test injections count on Lua-Resty over 10 runs under the same search budget.
 
-[![LUA-Resty-WAF](document/box_lua.pdf)
+![LUA-Resty-WAF](document/box_lua.png)
 - The distribution of the bypassing test injections count on ModSecurity over 10 runs under the same search budget.
-- 
-[![ModSecurity-WAF](document/box_mod.pdf)
+
+![ModSecurity-WAF](document/box_mod.png)
 
 
-
+![img.png](document/table.png)
