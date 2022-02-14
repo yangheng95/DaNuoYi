@@ -6,7 +6,6 @@
 # Copyright (C) 2021. All Rights Reserved.
 import random
 
-
 from DaNuoYi.deep_learning.classifier.fitness_assigner import FitnessAssigner
 from DaNuoYi.deep_learning.translator.translator import InjectionTranslator
 from DaNuoYi.evolution.entity.individual import Individual
@@ -19,7 +18,7 @@ from DaNuoYi.global_config import REGENERATE_COUNT
 
 
 class SingleTaskEvolution:
-    def __init__(self, args, logger):
+    def __init__(self, args, logger, rnd_select, no_mutation):
         self.task = args.tasks[0]
         self.pop = Population(self.task, args.pop_size)
         self.bypass_injection_by_task = {task: set() for task in args.tasks}
@@ -29,6 +28,9 @@ class SingleTaskEvolution:
         self.fitness_assigner.assign_fitness(self.pop)
 
         self.logger = logger
+
+        self.rnd_select = rnd_select
+        self.no_mutation = no_mutation
 
         if args.waf == 'mod_security':
             self.waf_address = MODSECURITY_WAF
@@ -43,7 +45,7 @@ class SingleTaskEvolution:
 
         self.visited = set()
 
-    def evolve(self, gen_id, rnd_select):
+    def evolve(self, gen_id):
         avg_fitness = self.pop.get_average_fitness()
         _pop = self.pop[:]
         for i in range(len(self.pop)):
@@ -66,7 +68,7 @@ class SingleTaskEvolution:
             #     else:
             #         _pop.append(Individual(idv.task))
 
-        if not rnd_select:
+        if not self.rnd_select:
             self.fitness_assigner.assign_fitness(_pop)
             _pop = sorted(_pop, key=lambda x: x.fitness, reverse=True)
         else:
@@ -77,7 +79,7 @@ class SingleTaskEvolution:
 
 
 class MultiTaskEvolution:
-    def __init__(self, args, logger):
+    def __init__(self, args, logger, rnd_select, no_mutation):
         self.tasks = args.tasks
         self.pops = {t: Population(t, args.pop_size) for t in args.tasks}
         self.bypass_injection_by_task = {task: set() for task in args.tasks}
@@ -95,6 +97,8 @@ class MultiTaskEvolution:
             self.fitness_assigners[task].assign_fitness(self.pops[task])
 
         self.logger = logger
+        self.rnd_select = rnd_select
+        self.no_mutation = no_mutation
 
         if args.waf == 'mod_security':
             self.waf_address = MODSECURITY_WAF
@@ -109,7 +113,7 @@ class MultiTaskEvolution:
 
         self.visited = set()
 
-    def evolve(self, gen_id, rnd_select):
+    def evolve(self, gen_id):
 
         for pop_name in self.pops:
             avg_fitness = self.pops[pop_name].get_average_fitness()
@@ -117,15 +121,18 @@ class MultiTaskEvolution:
             for i in range(len(self.pops[pop_name])):
                 idv, flag = self.perform_translate(pop_name)
                 if not flag:
-                    idv, flag = self.perform_mutate(i, pop_name)
+                    if self.no_mutation:
+                        idv = Individual(pop_name)
+                    else:
+                        idv, flag = self.perform_mutate(i, pop_name)
 
-                if not rnd_select:
+                if not self.rnd_select:
                     if idv.fitness > avg_fitness:
                         _pop.append(idv)
                     else:
                         _pop.append(Individual(idv.task))
 
-            if not rnd_select:
+            if not self.rnd_select:
                 self.fitness_assigners[pop_name].assign_fitness(_pop)
                 _pop = sorted(_pop, key=lambda x: x.fitness, reverse=True)
             else:

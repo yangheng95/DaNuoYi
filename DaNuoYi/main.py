@@ -18,16 +18,16 @@ from DaNuoYi.utils.logger import Logger
 from DaNuoYi.utils.net_utils import download_runtime_materials
 
 
-def start_evolve(tasks: list, args, logger, rnd_select):
+def start_evolve(tasks: list, args, logger, rnd_select, no_mutation):
     if len(tasks) > 1:
-        engine = MultiTaskEvolution(args, logger)
+        engine = MultiTaskEvolution(args, logger, rnd_select=rnd_select, no_mutation=no_mutation)
     else:
-        engine = SingleTaskEvolution(args, logger)
+        engine = SingleTaskEvolution(args, logger, rnd_select=rnd_select, no_mutation=no_mutation)
 
     bypass_case_per_generation = {task: [] for task in tasks}
 
     for i in tqdm(range(args.evolve_round)):
-        engine.evolve(gen_id=i, rnd_select=rnd_select)
+        engine.evolve(gen_id=i)
         for task in tasks:
             bypass_case_per_generation[task].append([i, engine.count_by_task[task]])
         print('Found bypass cases:{}'.format(engine.count_by_task))
@@ -50,7 +50,7 @@ def start_evolve(tasks: list, args, logger, rnd_select):
         plt.close()
 
 
-def quick_run(tasks=None, classifier_name='lstm', waf='mod_security', seed=None, rnd_select=False):
+def quick_run(tasks=None, classifier_name='lstm', waf='mod_security', seed=None, rnd_select=False, no_mutation=False):
     """
 
     :param tasks: Any subset from ["sqli", "xss", "osi", "phpi", "xmli", "htmli"]
@@ -58,6 +58,7 @@ def quick_run(tasks=None, classifier_name='lstm', waf='mod_security', seed=None,
     :param classifier_name: Any from ['lstm', 'rnn', 'gru']
     :param seed: random seed
     :param rnd_select: Disable fitness-based individual selection
+    :param no_mutation: Disable mutation in DaNuoYi
     :return:
     """
     if tasks is None:
@@ -80,12 +81,12 @@ def quick_run(tasks=None, classifier_name='lstm', waf='mod_security', seed=None,
             numpy.random.seed(sd)
             torch.manual_seed(sd)
             torch.cuda.manual_seed(sd)
-            start_evolve(arguments.tasks, arguments, logger, rnd_select)
+            start_evolve(arguments.tasks, arguments, logger, rnd_select, no_mutation)
 
     else:
         print('seed=None, start experiment mode (10 runs with random seeds for each trivial.)')
         for _ in range(10):
-            start_evolve(arguments.tasks, arguments, logger, rnd_select)
+            start_evolve(arguments.tasks, arguments, logger, rnd_select, no_mutation)
 
 if __name__ == "__main__":
     quick_run(waf='lua_resty_waf')

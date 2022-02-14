@@ -8,12 +8,13 @@ from pathlib import Path
 
 from setuptools import setup, find_packages
 cwd = Path(__file__).parent
-long_description = (cwd / "README.md").read_text(encoding='utf8')
+long_description = (cwd / "README.MD").read_text(encoding='utf8')
 setup(
     name='DaNuoYi',
-    version='0.1',
+    version='0.2.0',
     description='This package provide the interface to run multitask evolutionary injection generation',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/yangheng95/DaNuoYi',
     # Author details
     author='Heng, Yang',
